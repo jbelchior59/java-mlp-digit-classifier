@@ -17,15 +17,19 @@ Implementação em Java de uma rede neuronal MLP para classificação binária d
 
 A rede principal usa uma topologia `400 → 16 → 8 → 1`, recebendo imagens 20×20 (400 atributos) e produzindo uma probabilidade usada para distinguir os dígitos 2 e 3.
 
-## Estrutura principal
+## Código publicado
 
-- `src/DigitTrainer.java` — treino, avaliação, holdout estratificado, augmentation e ensemble
 - `src/MLP.java` — implementação da rede neuronal e backpropagation
 - `src/Matrix.java` — operações matriciais
 - `src/P4.java` — classificador final e carregamento dos modelos treinados
+- `src/MLPNXOR.java` — exemplo adicional de treino de uma MLP
+- `src/IDifferentiableFunction.java` — contrato das funções diferenciáveis
 - `src/Sigmoid.java` — função de ativação sigmoid
 - `src/Step.java` — função de decisão binária
-- `src/pesos/` — pesos e threshold dos modelos treinados
+
+## Conteúdo do projeto original
+
+O arquivo académico original inclui também `DigitTrainer.java`, os pesos/threshold do ensemble e o relatório do laboratório. Esses ficheiros não estão todos publicados neste repositório neste momento; `P4.java` requer os pesos treinados para executar a classificação final.
 
 ## Tecnologias
 
@@ -33,4 +37,4 @@ Java · Machine Learning · Redes Neuronais · MLP · Backpropagation · Ensembl
 
 ## Contexto
 
-Projeto académico desenvolvido na Universidade do Algarve. O modelo inclui regularização, early stopping e ensemble para melhorar a generalização do classificador.
+Projeto académico desenvolvido na Universidade do Algarve. O modelo original inclui regularização, early stopping, data augmentation e ensemble para melhorar a generalização do classificador.
