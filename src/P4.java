@@ -17,27 +17,38 @@ public class P4 {
     private static final String THRESHOLD_FILE = "threshold.txt";
 
     public static void main(String[] args) throws IOException {
+
         Scanner sc = new Scanner(System.in);
         sc.useDelimiter("[,;\\s]+");
+
         List<Double> values = readAllInput(sc);
 
-        if (values.isEmpty()) throw new IOException("No feature values supplied.");
-        if (values.size() % TOPOLOGY[0] != 0)
+        if (values.isEmpty()) {
+            throw new IOException("No feature values supplied.");
+        }
+
+        if (values.size() % TOPOLOGY[0] != 0) {
             throw new IOException("Input size is not a multiple of 400.");
+        }
 
         int m = values.size() / TOPOLOGY[0];
         Matrix X = new Matrix(m, TOPOLOGY[0]);
-        for (int idx = 0; idx < values.size(); idx++)
+
+        for (int idx = 0; idx < values.size(); idx++) {
             X.data[idx / TOPOLOGY[0]][idx % TOPOLOGY[0]] = values.get(idx);
+        }
 
         List<ModelParams> models = loadModels();
-        if (models.isEmpty()) throw new IOException("No models found in weights directory.");
+        if (models.isEmpty())
+            throw new IOException("No models found in weights directory.");
 
         double threshold = loadThreshold();
+
         double[] avgProb = new double[m];
         for (ModelParams model : models) {
             Matrix output = forward(X, model.weights, model.biases);
-            for (int i = 0; i < m; i++) avgProb[i] += output.get(i, 0);
+            for (int i = 0; i < m; i++)
+                avgProb[i] += output.get(i, 0);
         }
 
         double inv = 1.0 / models.size();
@@ -50,11 +61,15 @@ public class P4 {
 
     private static Matrix forward(Matrix X, Matrix[] weights, Matrix[] biases) {
         Matrix current = X;
-        for (int l = 0; l < weights.length; l++)
-            current = current.dot(weights[l]).addRowVector(biases[l]).apply(P4::sigmoidStable);
+        for (int l = 0; l < weights.length; l++) {
+            current = current.dot(weights[l])
+                             .addRowVector(biases[l])
+                             .apply(P4::sigmoidStable);
+        }
         return current;
     }
 
+    // Same sigmoid, just numerically stable.
     private static double sigmoidStable(double z) {
         if (z >= 0) {
             double e = Math.exp(-z);
@@ -67,13 +82,17 @@ public class P4 {
 
     private static Matrix loadMatrix(Path path) throws IOException {
         List<double[]> rows = new ArrayList<>();
+
         try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
+
                 String[] parts = line.split(",");
                 double[] row = new double[parts.length];
-                for (int i = 0; i < parts.length; i++) row[i] = Double.parseDouble(parts[i]);
+                for (int i = 0; i < parts.length; i++)
+                    row[i] = Double.parseDouble(parts[i]);
+
                 rows.add(row);
             }
         }
@@ -83,7 +102,9 @@ public class P4 {
     private static List<Double> readAllInput(Scanner sc) {
         List<Double> values = new ArrayList<>();
         Double value;
-        while ((value = nextDoubleOrNull(sc)) != null) values.add(value);
+        while ((value = nextDoubleOrNull(sc)) != null) {
+            values.add(value);
+        }
         return values;
     }
 
@@ -91,6 +112,7 @@ public class P4 {
         while (sc.hasNext()) {
             String tok = sc.next().trim();
             if (tok.isEmpty()) continue;
+
             tok = tok.replace(',', '.');
             return Double.parseDouble(tok);
         }
@@ -99,22 +121,30 @@ public class P4 {
 
     private static List<ModelParams> loadModels() throws IOException {
         Path base = resolveEnsembleDir();
+
         List<Path> ensembleDirs = new ArrayList<>();
         try (var stream = Files.list(base)) {
             stream.filter(p -> Files.isDirectory(p) && p.getFileName().toString().startsWith("model_"))
                   .forEach(ensembleDirs::add);
         }
+
+        // Deterministic order (safe)
         ensembleDirs.sort(Comparator.comparing(p -> p.getFileName().toString()));
-        if (ensembleDirs.isEmpty()) ensembleDirs = Collections.singletonList(base);
+
+        if (ensembleDirs.isEmpty())
+            ensembleDirs = Collections.singletonList(base);
 
         List<ModelParams> models = new ArrayList<>();
-        for (Path dir : ensembleDirs) models.add(loadModelFromDir(dir));
+        for (Path dir : ensembleDirs)
+            models.add(loadModelFromDir(dir));
+
         return models;
     }
 
     private static ModelParams loadModelFromDir(Path dir) throws IOException {
         Matrix[] weights = new Matrix[TOPOLOGY.length - 1];
         Matrix[] biases = new Matrix[TOPOLOGY.length - 1];
+
         for (int i = 0; i < weights.length; i++) {
             Path wPath = dir.resolve("w_layer" + (i + 1) + ".csv");
             Path bPath = dir.resolve("b_layer" + (i + 1) + ".csv");
@@ -128,11 +158,18 @@ public class P4 {
 
     private static double loadThreshold() throws IOException {
         Path tPath = resolveEnsembleDir().resolve(THRESHOLD_FILE);
-        if (!Files.exists(tPath)) return 0.5;
+        if (!Files.exists(tPath))
+            return 0.5;
+
         List<String> lines = Files.readAllLines(tPath, StandardCharsets.UTF_8);
-        if (lines.isEmpty()) return 0.5;
-        try { return Double.parseDouble(lines.get(0).trim()); }
-        catch (NumberFormatException ex) { return 0.5; }
+        if (lines.isEmpty())
+            return 0.5;
+
+        try {
+            return Double.parseDouble(lines.get(0).trim());
+        } catch (NumberFormatException ex) {
+            return 0.5;
+        }
     }
 
     private static Path resolveEnsembleDir() throws IOException {
@@ -143,11 +180,16 @@ public class P4 {
 
         try {
             Path codePath = Paths.get(P4.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
-            if (codePath != null) candidates.add(codePath.resolve(ENSEMBLE_DIR));
+            if (codePath != null) {
+                candidates.add(codePath.resolve(ENSEMBLE_DIR));
+            }
         } catch (Exception ignored) {}
 
-        for (Path candidate : candidates)
-            if (Files.exists(candidate)) return candidate;
+        for (Path candidate : candidates) {
+            if (Files.exists(candidate)) {
+                return candidate;
+            }
+        }
 
         throw new IOException("Weights directory not found. Checked: " + candidates);
     }
