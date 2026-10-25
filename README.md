@@ -2,6 +2,10 @@
 
 Implementação em Java de uma rede neuronal MLP para classificação binária de dígitos manuscritos **2 e 3**, desenvolvida no contexto académico de Inteligência Artificial.
 
+## Desempenho
+
+O classificador final com ensemble de 10 modelos atinge **mais de 99% de precisão** nos testes do projeto.
+
 ## Funcionalidades
 
 - MLP implementado de raiz em Java
@@ -19,7 +23,7 @@ A rede principal usa uma topologia `400 → 16 → 8 → 1`, recebendo imagens 2
 
 ## Conteúdo publicado
 
-A versão completa do projeto está publicada na branch `develop`. Inclui:
+O projeto inclui:
 
 - `src/DigitTrainer.java` — treino, validação, seleção de threshold e geração do ensemble
 - `src/MLP.java` — implementação da rede neuronal e backpropagation
@@ -31,14 +35,11 @@ A versão completa do projeto está publicada na branch `develop`. Inclui:
 - `bundle/` — partes usadas para reconstruir o pacote académico completo
 - `setup-and-test.bat` — reconstrução, compilação e teste local automatizados no Windows
 
-A branch `main` mantém uma versão mais pequena do código-fonte; para usar o conjunto completo acima, usa `develop`.
-
 ## Compilar e validar no Windows
 
 É necessário ter um JDK instalado e `javac` disponível no `PATH`.
 
 ```bat
-git checkout develop
 setup-and-test.bat
 ```
 
